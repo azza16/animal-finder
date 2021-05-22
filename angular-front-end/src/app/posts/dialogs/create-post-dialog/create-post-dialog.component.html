@@ -1,0 +1,97 @@
+<div id="post-form" mat-dialog-content>
+    <form [formGroup]="postForm" (submit)="createPost()">
+        <h1>New post</h1>
+        <hr>
+        <div id="input-container">
+            <div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Status</mat-label>
+                    <mat-select formControlName="status" required>
+                        <mat-option value="adoption">Adoption</mat-option>
+                        <mat-option value="lost">Lost</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Species</mat-label>
+                    <input matInput formControlName="species" required>
+                    <mat-hint>Ex: pig, dog</mat-hint>
+                </mat-form-field>
+            </div>
+    
+            <div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Location</mat-label>
+                    <input matInput formControlName="location" required>
+                </mat-form-field>
+            </div>
+    
+            <div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Contact Number</mat-label>
+                    <input matInput type="tel" formControlName="contactNumber" pattern="[0-9]{8}" required>
+                </mat-form-field>
+            </div>
+    
+            <div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Contact name (optional)</mat-label>
+                    <input matInput formControlName="contactName">
+                </mat-form-field>
+            </div>
+    
+            <div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Breed (optional)</mat-label>
+                    <input matInput formControlName="breed">
+                </mat-form-field>
+            </div>
+    
+    
+            <div>
+                <mat-form-field appearance="outline">
+                    <mat-label>Extra info (optional)</mat-label>
+                    <textarea matInput formControlName="info"></textarea>
+                </mat-form-field>
+            </div>
+    
+            <div class="post-image-upload">
+                <input type="file" class="file-input" accept=".jpg, .jpeg, .png" (change)="onFileSelected($event)" #fileUpload>
+    
+                <div class="file-upload">
+                    <div>
+                        {{fileName || "No image uploaded yet."}}
+                    </div>
+                    <div>
+                        <button mat-mini-fab color="primary" class="upload-btn" (click)="fileUpload.click()" type="button">
+                            <mat-icon>image</mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <div [hidden]="!filePath || filePath === ''" class="mt-3">
+                    <img id="img-input" [src]="filePath" width="200">
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div>
+            <mat-form-field appearance="outline" class="w-100">
+                <mat-label>Passphrase</mat-label>
+                <input matInput formControlName="passphrase" required>
+                <mat-hint><strong>This field will be required if you want to edit or remove the post so save it
+                        somewhere!</strong></mat-hint>
+            </mat-form-field>
+        </div>
+    
+        <div class="mt-4">
+            <button type="button" mat-stroked-button type="submit" class="w-100" [disabled]="!postForm.valid">
+                <mat-icon>post_add</mat-icon>
+                Post
+            </button>
+        </div>
+        <div class="alert alert-info text-center mt-3" role="alert">
+            A post becomes visible after it's <strong>approved</strong> by an admin
+        </div>
+    </form>
+</div>

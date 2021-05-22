@@ -1,0 +1,149 @@
+<div id="intro" class="bg-light p-3 rounded-lg">
+    <div>
+        <img src="assets/logo.png" alt="" width="100" height="100">
+    </div>
+    <div>
+        <h1 class="display-1">Welcome to Animal Finder!</h1>
+
+        <p class="lead">A platform which gives the opportunity to the community to help animals that are either lost or
+            in need of a home.</p>
+        <h4 class="text-muted">
+            No sign ups needed! Anyone can help instantly!
+        </h4>
+
+        <div class="mt-4">
+            <h3>
+                Start contributing now by creating a new post
+            </h3>
+            <button mat-raised-button (click)="createPost()">
+                <mat-icon>add_circle_outline</mat-icon>
+                Create post
+            </button>
+        </div>
+    </div>
+</div>
+<main>
+    <section id="filters">
+        <div *ngIf="isAdmin">
+            <mat-form-field appearance="outline">
+                <mat-label>Approved</mat-label>
+                <mat-select (selectionChange)="filterPosts('approved', $event.value)" [value]="false">
+                    <mat-option [value]="true">yes</mat-option>
+                    <mat-option [value]="false">no</mat-option>
+                    <mat-option value="all">all</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field appearance="outline">
+                <mat-label>Posted</mat-label>
+                <mat-select (selectionChange)="filterPosts('date', $event.value)" [value]="'all'">
+                    <mat-option value="now">Now</mat-option>
+                    <mat-option value="today">Today</mat-option>
+                    <mat-option value="week">This week</mat-option>
+                    <mat-option value="month">This month</mat-option>
+                    <mat-option value="year">This year</mat-option>
+                    <mat-option value="all">Anytime</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field appearance="outline">
+                <mat-label>Status</mat-label>
+                <mat-select (selectionChange)="filterPosts('status', $event.value)" [value]="'all'">
+                    <mat-option value="adoption">Adoption</mat-option>
+                    <mat-option value="lost">Lost</mat-option>
+                    <mat-option value="all">Any</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field appearance="outline">
+                <mat-label>Location</mat-label>
+                <input matInput type="text" (change)="filterPosts('location', $event.target.value)"
+                    matTooltip="Searches for posts with location that starts with value provided"
+                    [matTooltipPosition]="'above'">
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-form-field appearance="outline">
+                <mat-label>Species</mat-label>
+                <input matInput type="text" (keyup)="filterPosts('species', $event.target.value)"
+                    matTooltip="Searches for posts with species that starts with value provided"
+                    [matTooltipPosition]="'above'">
+            </mat-form-field>
+        </div>
+    </section>
+    <div *ngIf="posts.length > 0" id="posts" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="100"
+        (scrolled)="onScroll()">
+        <mat-card *ngFor="let post of posts">
+            <div *ngIf="isAdmin && !post.approved" class="text-center">
+                <button mat-stroked-button color="primary" aria-label="Approve post" title="Approve"
+                    (click)="approvePost(post._id)">
+                    Approve post
+                </button>
+            </div>
+            <div class="custom-header">
+                <div class="time-posted">
+                    <span class="text-muted">Posted: {{post.date | dateAgo}}</span>
+                </div>
+                <mat-card-actions>
+                    <button mat-icon-button color="primary" aria-label="Edit post" title="Edit"
+                        (click)="onClickUpdate(post)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="primary" aria-label="Delete post" title="Delete"
+                        (click)="onClickRemove(post)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </mat-card-actions>
+            </div>
+            <mat-card-header class="text-center">
+                <mat-card-title [ngStyle]="post.status === 'lost'? {'color': 'brown'} : {'color': 'steelblue'}">
+                    <mat-icon *ngIf="post.status === 'lost'">campaign</mat-icon>
+                    <mat-icon *ngIf="post.status === 'adoption'">cottage</mat-icon>
+                    {{post.status | titlecase}}
+                </mat-card-title>
+                <div class="post-subtitles">
+                    <mat-card-subtitle>
+                        <mat-icon>place</mat-icon>
+                        {{post.location}}
+                    </mat-card-subtitle>
+                    <mat-card-subtitle>
+                        <mat-icon>call</mat-icon>
+                        {{post.contactNumber}}
+                    </mat-card-subtitle>
+                    <mat-card-subtitle *ngIf="post.contactName">
+                        <mat-icon>contact_page</mat-icon>
+                        {{post.contactName}}
+                    </mat-card-subtitle>
+                </div>
+                <div class="post-subtitles">
+                    <mat-card-subtitle>
+                        <mat-icon>emoji_nature</mat-icon>
+                        {{post.species | titlecase}}
+                    </mat-card-subtitle>
+                    <mat-card-subtitle *ngIf="post.breed">
+                        <mat-icon>layers</mat-icon>
+                        {{post.breed | titlecase}}
+                    </mat-card-subtitle>
+                    <button *ngIf="post.info" mat-mini-fab color="primary" class="my-fab"
+                        aria-label="More button"
+                        [matTooltip]="post.info"
+                        [matTooltipPosition]="'above'">
+                        <mat-icon>more_horiz</mat-icon>
+                    </button>
+                </div>
+            </mat-card-header>
+            <img mat-card-image src="{{post.image}}" width="300" height="200">
+        </mat-card>
+    </div>
+    <div *ngIf="posts.length === 0 && finishedLoading">
+        <div class="alert alert-primary m-5 text-center" role="alert">
+            No posts found
+            <span class="material-icons ms-2">
+                sentiment_very_dissatisfied
+            </span>
+        </div>
+    </div>
+</main>

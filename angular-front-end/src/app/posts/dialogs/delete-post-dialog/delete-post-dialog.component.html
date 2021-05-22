@@ -1,0 +1,23 @@
+<div class="mb-4 text-center">
+    <img src="{{data.image}}" width="50" height="50">
+</div>
+<div>
+    <mat-form-field appearance="outline">
+        <mat-label>Passphrase</mat-label>
+        <input matInput type="text" required (keyup)="checkPassphraseMatch($event.target.value)">
+    </mat-form-field>
+    <div *ngIf="match !== undefined && !match" class="alert alert-danger" role="alert">
+        Passphrase does not match!
+    </div>
+    <div *ngIf="match !== undefined && match" class="alert alert-success" role="alert">
+        Passphrase matches!
+    </div>
+
+    <div class="mt-3">
+        <button type="button" mat-stroked-button type="submit" class="w-100" [disabled]="!match"
+            (click)="onClickDelete()">
+            <mat-icon>delete</mat-icon>
+            Delete post
+        </button>
+    </div>
+</div>
